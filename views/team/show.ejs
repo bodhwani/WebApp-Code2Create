@@ -2,25 +2,27 @@
 <%- partial('../partials/commonScripts.ejs') %>
 <script type="text/javascript">
   function  getUserDetails(memberid){
-    $.get("http://c2c.acmvit.in/user/showsingleuser/"+memberid, function (data, status) {
+    $.get("<%=defaultUrl.url()%>user/showsingleuser/"+memberid, function (data, status) {
       if (!data)
         console.log("Failure in getting individual user info");
       else {
         console.log("successfully in getting info user");
         $("#"+memberid+"_username").text(data[0].username);
-        var lin="/user/show/"+data[0].username;
+        var  namecode=encode(encodeURI(data[0].username));
+        var lin="/user/show/"+namecode;
+      
         $("#"+memberid+"_anchor").attr('href',lin);
         $("#"+memberid+"_name").text(data[0].name);
         $("#"+memberid+"_description").text(data[0].description);
         if(data[0].internal_external=='internal')
-          $("#"+memberid+"_college_name").text("VIT University");
+          $("#"+memberid+"_college_name").text("VIT, Vellore");
         else
          $("#"+memberid+"_college_name").text(data[0].college_name);
      }
    });
   }
 </script>
-<link rel="stylesheet" href="/styles/app_common.css">
+<link rel="stylesheet" href="/styles/app_common.css?1100">
 <style>
   #submit_mock {
     margin-top: 20px;
@@ -71,24 +73,30 @@ trackk='not found';
    <h5 class="left-align white-text main-heading">Team details</h5>
  </div>
  <div class="my-main-card hoverable white-text">
-  <p class="detail-title">
-    Team Name
-  </p>
-  <p class="detail-answer">
-    <%=team.teamName%>
-  </p>
-  <p class="detail-title">
-    Team Track
-  </p>
-  <p class="detail-answer">
-    <%=trackk%>
-  </p>
-  <p class="detail-title">
+ <div class="row margin-bottom-0">
+     <div class="col s12 m6">
+      <p class="detail-title">
+        Team Name
+      </p>
+      <p class="detail-answer">
+        <%=team.teamName%>
+      </p>
+    </div>
+    <div class="col s12 m6">
+      <p class="detail-title">
+        Team Track
+      </p>
+      <p class="detail-answer">
+        <%=trackk%>
+      </p>
+    </div>
+  </div>
+  <!-- <p class="detail-title">
     Project Detail
   </p>
   <p class="detail-answer">
     <%=team.description %>
-  </p>
+  </p> -->
 </div>
 </div>
 
@@ -99,7 +107,7 @@ trackk='not found';
  <div class="my-main-card hoverable">
   <table class="bordered striped responsive-table white-text">
     <thead>
-      <td>userid</td>
+      <td>UserName</td>
       <td>Name</td>
       <td>Skills</td>
       <td>University</td>
@@ -127,11 +135,11 @@ trackk='not found';
 
 
 <%- partial('../partials/footer.ejs') %>
-  <script type="text/javascript">
-   <% if(typeof flash !== 'undefined' && typeof flash.err !== 'undefined' && flash.err){ %>
-    sweetAlert("Error", "<%=flash.err%>", "error");
-    <% } %>
-    <% if(typeof flash !== 'undefined' && typeof flash.success !== 'undefined' && flash.success){ %>
+<script type="text/javascript">
+ <% if(typeof flash !== 'undefined' && typeof flash.err !== 'undefined' && flash.err){ %>
+  sweetAlert("Error", "<%=flash.err%>", "error");
+  <% } %>
+  <% if(typeof flash !== 'undefined' && typeof flash.success !== 'undefined' && flash.success){ %>
     sweetAlert("success", "<%=flash.success%>", "success");
     <% } %>
   </script>

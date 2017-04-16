@@ -56,18 +56,61 @@ module.exports = {
        unique: true
     },
 
+    track : {
+      type : "string"
+    },
+
     description : {
       type : 'text',
       required : false
     },
 
-    //to whom i am sending request
+    problemStatement : {
+      type : "text",
+      defaultsTo : "a"
+    },
 
-    checkmembers : function (userid) {
+    uniqueness : {
+      type : "float"
+    },
+
+    feasibility : {
+      type : "float"
+    },
 
 
+    implementation : {
+      type : "float"
+    },
 
 
+    solution : {
+      type : "float"
+    },
+
+
+    presentation : {
+      type : "float"
+    },
+
+
+    ui : {
+      type : "float"
+    },
+
+    judge : {
+      type : "array",
+      defaultsTo : [],
+    },
+
+    Score : {
+      type : 'array',
+      required : false
+    },
+
+    bool : {
+      type : "boolean",
+      defaultsTo : false
     }
 
 

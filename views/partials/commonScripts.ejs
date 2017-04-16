@@ -1,7 +1,6 @@
 
-<script src="/js/vendor/jquery.min.js"></script>
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
-	<script>window.jQuery || document.write('<script src="/js/vendor/jquery.min.js"><\/script>')</script> -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+	<script>window.jQuery || document.write('<script src="/js/vendor/jquery.min.js"><\/script>')</script>
 	<script type="text/javascript" src="/materialize/js/materialize.min.js"></script>
 	<script>
 		$(document).ready(function () {
@@ -11,15 +10,15 @@
 	<script type="text/javascript">
 //get the info of currently logged in user
 var cur_is_admin=false;
-$.get("http://c2c.acmvit.in/navbar/getinfo", function (data, status) {
+$.get("<%=defaultUrl.url()%>navbar/getinfo", function (data, status) {
 	var username_togive="undefined";
 	if (!data || !data.username)
 		console.log("Failure!", "Couldn't fetch navbar/getinfo");
 	else {
 		console.log("successfully fetched navbar/getinfo");
 		username_togive=data.username;
-		console.log("The username is:"+username_togive);
-		$("#usernameField").text(username_togive);
+		//console.log("The username is:"+username_togive);
+		$(".usernameField").text(username_togive);
 		var is_team=data.anotherTeam;
 		var is_admin=data.admin;
 		cur_is_admin=is_admin;
@@ -47,3 +46,11 @@ $.get("http://c2c.acmvit.in/navbar/getinfo", function (data, status) {
 });
 </script>
 <script type="text/javascript" src="/js/sweetalert.min.js"></script>
+<!--
+1. heroku login
+2. heroku git:remote -a <appName>
+3. git push heroku master
+
+heroku config:set NODE_ENV=production
+
+-->

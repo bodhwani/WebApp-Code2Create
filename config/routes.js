@@ -35,14 +35,45 @@
   '/': {
     view: 'homepage'
   },
-  '/register' : 'UserController.new',
-  '/login' : 'SessionController.new',
-  '/rules' : {
-    view: 'rules'
+  '/user' : {
+    view : '404'
   },
-  '/agenda' : {
-    view: 'agenda'
-  },
+  '/team' : {
+   view : '404'
+ },
+ '/register' : 'UserController.new',
+ '/login' : 'SessionController.new',
+ '/rules' : {
+  view: 'rules',
+  locals: {
+    title: 'Rules | Code2Create'
+  }
+},
+'/agenda' : {
+  view: 'tracks',
+  locals: {
+    title: 'Tracks | Code2Create'
+  }
+},
+'/tracks' : {
+  view: 'tracks',
+  locals: {
+    title: 'Tracks | Code2Create'
+  }
+},
+'/timeline' : {
+  view : 'timeline',
+  locals: {
+    title: 'Timeline | Code2Create'
+  }
+},
+'/prizes' : {
+  view : 'prizes',
+  locals: {
+    title: 'Prizes and Perks | Code2Create'
+  }
+},
+'/welcome' : 'SessionController.welcome',
 
 
   /***************************************************************************

@@ -5,13 +5,18 @@ var request = require('request');
 
 module.exports = {
 
+
+
+
   'new' : function (req, res) {
     if(req.session.authenticated)
     {
       res.redirect('/session/welcome');
       return;
     }
-    res.view();
+    res.view({
+      title: "Register | Code2Create"
+    });
 
   },
 
@@ -21,7 +26,7 @@ module.exports = {
     var us_name = req.param('name');
     var us_regno = req.param('regno');
     var us_phoneno = req.param('phoneno');
-    var us_email = req.param('email')
+    var us_email = req.param('email');
     var us_username = req.param('username');
     var us_internal_external = req.param('internal_external');
     var us_college_name = req.param('college_name');
@@ -86,7 +91,7 @@ module.exports = {
         User.create(params_needed, function userCreated(err, user) {
           if (err) {
             req.session.flash = {
-              err: "Error: Could not register"
+              err: "Please use different username or email."
             };
             return res.redirect('/register');
           }
@@ -100,24 +105,24 @@ module.exports = {
             );
 
 
-            req.session.authenticated = true;
-            req.session.User = user;
+          req.session.authenticated = true;
+          req.session.User = user;
 
 
-            req.session.flash = {
-              success: "Successfully Registered!",
-              ip: us_ip,
-              response: us_response
-            };
+          req.session.flash = {
+            success: "Successfully Registered!",
+            ip: us_ip,
+            response: us_response
+          };
           Mailer.sendWelcomeMail(user);
           //return res.json({user: user, token: sailsTokenAuth.issueToken(user.id)});
-          return res.redirect('/session/welcome');
+          return res.redirect('/welcome');
         }
         );
       }
       else {
         req.session.flash = {
-          err: "Error: Couldn't Verify ReCaptcha"
+          err: "Error: Could not Verify ReCaptcha"
         };
         return res.redirect('/register');
       }
@@ -132,6 +137,7 @@ module.exports = {
       username : req.param('id')
     }).exec(function(err, user) {
 
+
       if (err) {
         req.session.flash = {
           err : "Sorry, Error in finding user"
@@ -142,17 +148,19 @@ module.exports = {
         req.session.flash = {
           err : "Sorry, No user found"
         };
-        res.view();
+        res.redirect('/user/showall');
         return;
       }
 
      // return res.status(200).json(user);
      res.view({
-      user : user
+      user : user,
+      title: user.name + " | Code2Create"
     });
      return;
 
-   });
+   })
+
   },
 
   //this is for backend.
@@ -178,43 +186,83 @@ module.exports = {
 
 
 
+  // showall : function (req, res, next) {
+  //
+  //
+  //   var iduser = 0;
+  //   var count = 0;
+  //   var final = 0;
+  //   var memberarray = [];
+  //   Team.find(function foundTeams(err, teams) {
+  //     if (err) {
+  //       return next(err);
+  //     }
+  //     User.find(function foundUsers(err, users) {
+  //       users.forEach(function (user) {
+  //         teams.forEach(function (team) {
+  //
+  //
+  //           for(var i=0 ; i<team.memberAccepted.length; i++){
+  //
+  //             if(team.memberAccepted[i] != user.id){
+  //               count = count + 1;
+  //             }
+  //             //   }
+  //             if(count === team.memberAccepted.length){
+  //               final = final + 1;
+  //             }
+  //             //   count = 0;
+  //           }
+  //           count = 0;
+  //
+  //         });
+  //
+  //
+  //
+  //         if(teams.length === final){
+  //           memberarray.push(user);
+  //         }
+  //         final = 0;
+  //
+  //
+  //       });
+  //
+  //      // return res.status(200).json(memberarray);
+  //       res.view({
+  //         users : users,
+  //         memberarray : memberarray
+  //       });
+  //       return;
+  //
+  //       //
+  //     })
+  //
+  //   });
+  //
+  // },
+
   showall : function (req, res, next) {
 
 
-    console.log("Entered into showall");
     var iduser = 0;
     var count = 0;
     var final = 0;
     var memberarray = [];
     Team.find(function foundTeams(err, teams) {
       if (err) {
-        console.log("HEre is the error");
-        console.log(err);
-        return next(err);
+        req.session.flash = {
+          err : "Sorry, Error in finding users"
+        };
+        return res.redirect('/user/showall');
       }
       User.find(function foundUsers(err, users) {
         users.forEach(function (user) {
           teams.forEach(function (team) {
 
-            console.log("Here is the team :");
-            console.log(team);
-
-            for(var i=0 ; i<team.memberAccepted.length; i++){
-
-              if(team.memberAccepted[i] != user.id){
-                count = count + 1;
-              }
-              //   }
-              if(count === team.memberAccepted.length){
-                final = final + 1;
-              }
-              //   count = 0;
+            if(team.admin != user.id){
+              final = final + 1;
             }
-            count = 0;
-
           });
-
-
 
           if(teams.length === final){
             memberarray.push(user);
@@ -224,10 +272,11 @@ module.exports = {
 
         });
 
-       // return res.status(200).json(memberarray);
+        // return res.status(200).json(memberarray);
         res.view({
           users : users,
-          memberarray : memberarray
+          memberarray : memberarray,
+          title: "All Members | Code2Create"
         });
         return;
 
@@ -251,20 +300,23 @@ module.exports = {
         req.session.flash = {
           err : "Sorry, Error in finding user"
         };
-        res.view();
+        res.view({
+          title: "Your Profile | Code2Create"
+        });
         return;
       }
       if (!user) {
         req.session.flash = {
           err : "Sorry, No user found"
         };
-         res.view();
+        res.view();
         return;
       }
 
      // return res.status(200).json(user);
      res.view({
-      user : user
+      user : user,
+      title: "Your Profile | Code2Create"
     });
      return;
 
@@ -298,7 +350,7 @@ module.exports = {
       phoneno: us_phone,
       description: us_description,
       github: us_github,
-      linkedin: us_linkedin,
+      linkedin: us_linkedin
 
     };
 
@@ -318,7 +370,55 @@ module.exports = {
       };
       return res.redirect('/user/edit/'+ user.username);
     });
-  }
+  },
+
+
+
+  'editpassword' : function (req, res) {
+    res.view();
+  },
+
+
+  updatepassword :  function(req,res,next){
+
+    User.findOne({
+      username : req.param('username'),
+      phoneno : (req.param('phoneno'))
+    }).exec(function(err, user) {
+      if(user){
+
+        User.update(req.param('id'),req.params.all(), function userUpdated(err){
+          if(err){
+
+            req.session.flash = {
+              err : "Sorry, cannot update password."
+            };
+            return res.redirect('/user/editpassword/' + req.param('id'));
+          }
+
+          // return res.status(200).json({
+          //   message : "Successfullly updated password"
+          // });
+          req.session.flash = {
+            success : "Successfully updated password."
+          };
+          return res.redirect('/session/new');
+        });
+
+      }
+      else{
+        req.session.flash = {
+          err : "Sorry,No user found.Please enter valid credentials"
+        };
+        // return res.status(200).json({
+        //   message : "No user updated password"
+        // });
+        return res.redirect('/user/editpassword/' + req.param('id'));
+
+      }
+
+      });
+  },
 
   // forgetPasswordd : function (req, res, next) {
   //
@@ -340,7 +440,6 @@ module.exports = {
   //
   //     if(user){
   //       //Mailer.sendWelcomeMail(user);
-  //       console.log(user);
   //       res.status(200).json({
   //         user:  user,
   //         message : "Check your email"
@@ -362,6 +461,382 @@ module.exports = {
   //
   //
   // }
+
+  external : function (req, res, next) {
+
+    var temparray = [];
+    var namearray = [];
+    var emailarray = [];
+
+    User.find({
+      internal_external : 'external'
+    },function foundUsers(err, users){
+      if(err) return next(err);
+      users.forEach(function(user){
+        temparray.push(user.phoneno);
+        namearray.push(user.name);
+        emailarray.push(user.email);
+      });
+
+
+    });
+  },
+
+  singlemultiple : function (req, res, next) {
+
+    var namearray = [];
+    var singlemember = [];
+    var multiplemember = [];
+
+
+
+    Team.find(function foundTeams(err, teams){
+      User.find(function foundUsers(err, users){
+
+        if(err) return next(err);
+
+        teams.forEach(function(team){
+          // console.log(team.memberAccepted[0]);
+
+          for(var i=0; i < team.memberAccepted.length; i++){
+            users.forEach(function(user) {
+              if(team.memberAccepted[i] === user.id){
+                namearray.push(user);
+              }
+
+            });
+
+          }
+          //namearray.push(team);
+          if(namearray.length === 1){
+            singlemember.push(namearray);
+          }
+          else{
+            multiplemember.push(namearray);
+          }
+          // console.log(temparray.length);
+
+          namearray = [];
+
+        });
+        return res.status(200).json({
+          singlemember : singlemember,
+          multiplemember : multiplemember
+
+        });
+
+      });
+
+
+    });
+
+
+
+
+    //});
+  },
+
+  externalTeam : function (req, res, next) {
+
+    var externalarray = [];
+    var array = [];
+
+    Team.find(function foundTeams(err, teams){
+      User.find(function foundUsers(err, users){
+
+        if(err) return next(err);
+
+        teams.forEach(function(team){
+          // console.log(team.memberAccepted[0]);
+
+          for(var i=0; i < team.memberAccepted.length; i++){
+            users.forEach(function(user) {
+              if(team.memberAccepted[i] === user.id){
+                if(user.internal_external === "external") {
+                  array.push(user);
+                }
+              }
+            });
+          }
+
+          array.push(team);
+          externalarray.push(array);
+          array = [];
+        });
+        return res.status(200).json({
+          externalarray : externalarray
+        });
+
+      });
+
+
+    });
+
+
+
+  },
+
+  externalMembers : function (req, res, next) {
+
+    var externalmembers = [];
+    var array = [];
+     User.find(function foundUsers(err, users){
+
+        if(err) return next(err);
+
+            users.forEach(function(user) {
+              if(user.internal_external === "external"){
+                externalmembers.push(user);
+              }
+            });
+        return res.status(200).json({
+          externalmembers : externalmembers
+        });
+
+     });
+
+
+
+
+
+  },
+
+  genderUsers : function (req, res, next) {
+
+    var malearray = [];
+    var femalearray = [];
+    User.find(function foundUsers(err, users){
+
+      if(err) return next(err);
+
+      users.forEach(function(user) {
+        if(user.gender === "male"){
+          malearray.push(user);
+        }
+        else{
+          femalearray.push(user);
+        }
+      });
+      return res.status(200).json({
+        maleUsers : malearray,
+        femaleUsers : femalearray
+      });
+
+    });
+
+
+
+
+
+  },
+
+  tracks : function (req, res, next) {
+
+    var arvrteam = [];
+    var cleanteam = [];
+    var helcteam = [];
+    var fintteam = [];
+
+    var tempclean = [];
+    var tempfint = [];
+    var temphelc = [];
+    var temparvr = [];
+
+
+    Team.find(function foundTeams(err, teams){
+      User.find(function foundUsers(err, users){
+
+        if(err) return next(err);
+
+        teams.forEach(function(team){
+
+          if(team.clen === "1"){
+            cleanteam.push(team);
+
+            users.forEach(function(user) {
+              if(team.admin === user.id){
+                cleanteam.push(user);
+              }
+            });
+            tempclean.push(cleanteam);
+            // tempclean.push(userdetails);
+            cleanteam = [];
+          }
+
+          if(team.fint === "1"){
+            fintteam.push(team);
+
+            users.forEach(function(user) {
+              if(team.admin === user.id){
+                fintteam.push(user);
+              }
+            });
+            tempfint.push(fintteam);
+            fintteam = [];
+
+          }
+
+          if(team.helc === "1"){
+            helcteam.push(team);
+
+            users.forEach(function(user) {
+              if(team.admin === user.id){
+                helcteam.push(user);
+              }
+            });
+            temphelc.push(helcteam);
+            helcteam = [];
+          }
+
+          if(team.arvr === "1"){
+            arvrteam.push(team);
+
+            users.forEach(function(user) {
+              if(team.admin === user.id){
+                arvrteam.push(user);
+              }
+            });
+            temparvr.push(arvrteam);
+            arvrteam = [];
+          }
+
+        });
+        return res.status(200).json({
+          tempclean : tempclean,
+          tempfint : tempfint,
+          temphelc : temphelc,
+          temparvr : temparvr
+        });
+
+      });
+
+
+    });
+
+  },
+
+  passwordusers : function (req, res, next) {
+    var idemail = [];
+    var final = [];
+    User.find({
+      encryptedPassword : "$2a$10$E64tJt4WaiqE4yaWccj7EOdAhqksfiTy4JETtnFBJ.7ALcjZomyr6"
+    }, function foundUsers(err, users) {
+      users.forEach(function (user) {
+        idemail.push(user.id);
+        idemail.push(user.name);
+        idemail.push(user.email);
+        final.push(idemail);
+        idemail = [];
+      });
+      for(var i=0;i<final.length; i++){
+        changePassword.sendWelcomeMail(final[i]);
+      }
+      return res.json({
+        users : final
+      })
+
+    })
+  },
+
+
+
+  notInanyTeam : function (req, res, next) {
+
+    var noMembers = [];
+    var count = 0;
+
+    User.find(function foundUsers(err, users){
+      Team.find(function foundTeams(err, teams){
+
+        if(err) return next(err);
+
+        users.forEach(function(user){
+
+          teams.forEach(function (team) {
+            for(var i=0; i < team.memberAccepted.length; i++) {
+              if (team.memberAccepted[i] === user.id) {
+                count = 1000000000;
+              }
+            }
+
+          });
+          if(count === 0){
+            if(user.internal_external === "internal") {
+              noMembers.push(user)
+            }
+          }
+          count = 0;
+
+
+        });
+        return res.status(200).json({
+          noMembers : noMembers
+        });
+
+
+      });
+
+
+    });
+
+  },
+
+
+  teamsAccToTracks : function(req, res, next){
+    var teamarray = [];
+
+    Team.find(function foundTeams(err, teams) {
+      teams.forEach(function(team){
+        if(team.memberAccepted.length > 1) {
+          teamarray.push(team);
+        }
+      });
+      return res.status(200).json({
+        allteams : teamarray
+      });
+    });
+
+    },
+
+
+
+  // noOfMembersinTeam : function (req, res, next) {
+  //
+  //   var externalarray = [];
+  //   var array = [];
+  //   var length = 0;
+  //
+  //
+  //   Team.find(function foundTeams(err, teams){
+  //     User.find(function foundUsers(err, users){
+  //
+  //       if(err) return next(err);
+  //
+  //       teams.forEach(function(team){
+  //         // console.log(team.memberAccepted[0]);
+  //
+  //         length = length + team.memberAccepted.length;
+  //
+  //       });
+  //       console.log(length);
+  //       // return res.status(200).json({
+  //       //   externalarray : externalarray
+  //       // });
+  //
+  //     });
+  //
+  //
+  //   });
+  //
+  //
+  //
+  // }
+
+
+
+
+
+
 };
 
 

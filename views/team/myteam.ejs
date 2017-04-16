@@ -1,4 +1,4 @@
-    <link rel="stylesheet" href="/styles/app_common.css">
+    <link rel="stylesheet" href="/styles/app_common.css?1100">
     <style>
       #submit_mock {
         margin-top: 20px;
@@ -23,7 +23,7 @@
         margin-right: 60px;
       }
       .track-col{
-        height: 190px;
+        height: 170px;
         padding: 1.5rem !important;
         background-color: #373d41;
         border-radius: 10px;
@@ -31,6 +31,10 @@
         cursor: pointer;
         width: 45% !important;
         margin: 2% !important;
+        -webkit-transition: all 0.3s ease;
+        -o-transition: all 0.3s ease;
+        -moz-transition: all 0.3s ease;
+        transition: all 0.3s ease;
       }
 
       .track-col .track-img{
@@ -74,7 +78,10 @@
       .track-col:hover .overlay{
        opacity: 1;
      }
-     .track-col .overlay .track-heading{
+     .track-col:hover{
+      padding: 0.7rem !important;
+    }
+    .track-col .overlay .track-heading{
       vertical-align: middle;
       margin-top: 30%;
     }
@@ -107,6 +114,9 @@
   .team-remove:hover{
     background-color: #bf291d !important;
   }
+  .invite-others-but{
+    margin-left: 10px;
+  }
   @media(min-width: 601px){
     .track-col{
      height: 210px;
@@ -114,17 +124,27 @@
      margin: 2% !important;
    }
  }
+ @media(max-width: 769px){
+  .track-col .overlay{
+    opacity: 1;
+  }
+   .invite-others-but{
+    margin-top: 10px;
+  }
+ }
+
 </style>
 <%- partial('../partials/commonScripts.ejs') %>
 <script type="text/javascript">
   function  getUserDetails(memberid){
-    $.get("http://c2c.acmvit.in/user/showsingleuser/"+memberid, function (data, status) {
+    $.get("<%=defaultUrl.url()%>user/showsingleuser/"+memberid, function (data, status) {
       if (!data)
         console.log("Failure in getting individual user info");
       else {
         console.log("successfully in getting info user");
         $("#"+memberid+"_username").text(data[0].username);
-        var lin="/user/show/"+data[0].username;
+         var  namecode=encode(encodeURI(data[0].username));
+        var lin="/user/show/"+namecode;
         $("#"+memberid+"_anchor").attr('href',lin);
         $("#"+memberid+"_name").text(data[0].name);
         $("#"+memberid+"_description").text(data[0].description);
@@ -145,17 +165,17 @@
       <% if(admin) { %>
       <form action="/team/update" method="POST" id="teamForm" autocomplete="on">
         <% } %>
-        <div class="col m6 offset-m3">
+        <div class="col s12 m6 offset-m3">
           <p class="detail-title">
             teamID
           </p>
           <p class="detail-answer margin-bottom-0">
            <i class="material-icons prefix ver-align-middle white-text">account_circle</i>
-           <span class="ver-align-middle"><a href="/team/show/<%=team.teamName%>" class="underline-wala"><%=team.teamName%></a></span>
+           <span class="ver-align-middle"><a href="/team/show/<%=defaultUrl.encode(encodeURI(team.teamName))%>" class="underline-wala"><%=team.teamName%></a></span>
          </p>
        </div>
        <div class="row">
-        <div class="col s12">
+        <div class="col s11 offset-s1">
           <h5 class="left-align grey-colour">Priority for each Track:</h5>
         </div>
         <div class="col m3 s6 track-col" id="track-col_arvr">
@@ -165,7 +185,7 @@
           </div>
           <div class="rank-disp" id="rank1">
           </div>
-          <img src="/images/tracks/ar.png" class="track-img responsive-img">
+          <img src="/images/tracks/track_arvr.png" class="track-img responsive-img">
         </div>
         <div class="col m3 s6 track-col" id="track-col_helc">
          <input type="hidden" name="helc" class="inp_track">
@@ -174,7 +194,7 @@
         </div>
         <div class="rank-disp">
         </div>
-        <img src="/images/tracks/helc.jpg" class="track-img responsive-img">
+        <img src="/images/tracks/track_helc.png" class="track-img responsive-img">
       </div>
       <div class="col m3 s6 track-col" id="track-col_fint">
        <input type="hidden" name="fint" class="inp_track">
@@ -183,7 +203,7 @@
       </div>
       <div class="rank-disp">
       </div>
-      <img src="/images/tracks/fintech.jpg" class="track-img responsive-img">
+      <img src="/images/tracks/track_fint.png" class="track-img responsive-img">
     </div>
     <div class="col m3 s6 track-col" id="track-col_clen">
      <input type="hidden" name="clen" class="inp_track">
@@ -192,22 +212,22 @@
     </div>
     <div class="rank-disp">
     </div>
-    <img src="/images/tracks/clen.jpg" class="track-img responsive-img">
+    <img src="/images/tracks/track_clen.png" class="track-img responsive-img">
   </div>
 </div>
 <div class="input-field col s12 m12">
   <% if(!admin){ %>
-  <p class="detail-title">
+ <!--  <p class="detail-title">
     Project Detail
   </p>
   <p class="detail-answer white-text">
     <%=team.description %>
   </p>
-  <br>
+  <br> -->
   <% } %>
   <% if(admin){ %>
-  <textarea id="description" class="validate materialize-textarea" name="description"><%=team.description%></textarea>
-  <label for="description">Description of your project...</label>
+  <!-- <textarea id="description" class="validate materialize-textarea" name="description"><%=team.description%></textarea>
+  <label for="description">Description of your project...</label> -->
   <% } %>
 </div>
 <% if(admin){ %>
@@ -226,11 +246,13 @@
 <% if(admin) { %>
 <div class="row center">
   <br>
-  <form action="/team/removemember" method="POST">
+  <form action="/team/removemember" method="POST" class="display-inline-block">
     <input type="hidden" name="uid" value="<%=team.admin%>" >
-    <button type="submit" name="submit" value="Destroyteam" class="red btn waves-effect waves-light">
-      <i class="fa fa-trash-o" aria-hidden="true"></i> Destroy Team
+    <button type="submit" id="leave_<%=team.admin%>" class="hide" name="submit" value="leave">delete true</button>
+    <button type="button" class="red btn waves-effect waves-light" onclick='confirm_submit("leave_<%=team.admin%>","Are you sure you want to Delete the team ?","The Team will be removed. However, you must remove all the members before deleting the team","Delete Team")'>
+      <i class="fa fa-trash-o" aria-hidden="true"></i> Delete Team</button>
     </form>
+    <a href="/user/showall" class="green btn waves-effect waves-light invite-others-but"><i class="fa fa-search" aria-hidden="true"></i> Invite others to Join My team</a>
   </div>
   <% } %>
   <!-- FOR LEAVE TEAM -->
@@ -239,71 +261,75 @@
     <br>
     <form action="/team/leaveteam" method="POST">
       <input type="hidden" name="id" value="<%=team.id%>">
-      <button type="submit" name="submit" value="Destroyteam" class="red btn waves-effect waves-light">
+      <button id="leave_<%=team.id%>" class="hide" type="submit" name="submit" value="leave">Leave true</button>
+      <button type="button" class="red btn waves-effect waves-light" onclick='confirm_submit("leave_<%=team.id%>","Are you sure you want to leave the team ?","Once you leave the team, you can create your own team or accept Invitation from others","Leave Team")'>
         <i class="fa fa-sign-out" aria-hidden="true"></i> Leave Team
-      </form>
-    </div>
-    <% } %>
-    <div class="col s12">
-      <h5 class="left-align color-theme-green">Team Members:</h5>
-      <table class="bordered striped responsive-table white-text">
-        <thead>
-          <th>userID</th>
-          <th>Name</th>
-          <th>Skills</th>
-          <th>Status</th>
-          <% if(admin){ %>
-          <th>Remove</th>
-          <% } %>
-        </thead>
-        <tbody>
-          <% _.each(team.memberAccepted,function(memberid){ %>
-          <tr>
-           <td><a id="<%=memberid%>_anchor" class="ver-align-middlee underline-wala">
-            <span id="<%=memberid%>_username"></span>
-            <% if(memberid==team.admin){ %>
-            <img src="/images/admin.png" class="admin-img">
-            <%}%></a></td>
-            <td> <span id="<%=memberid%>_name"></span></td>
-            <td> <span id="<%=memberid%>_description"></span></td>
-            <td><span class="team-status team-status-joined">Joined</span></td>
-            <% if(admin && !(memberid==team.admin)) {%>
-            <td>
-              <form action="/team/removemember" method="POST">
-                <input type="hidden" name="uid" value="<%=memberid%>">
-                <button type="submit" class="team-status team-remove" value="remove"><i class="fa fa-times" aria-hidden="true"></i> Remove</button>
-              </form>
-            </td>
-            <% } %>
-            <script type="text/javascript">
-              getUserDetails("<%=memberid%>");
-            </script>
-          </tr>
-
-          <% }); %>
-          <% _.each(team.memberSend,function(memberid){ %>
-          <tr>
-            <td>
-              <a id="<%=memberid%>_anchor" class="ver-align-middlee underline-wala">
-                <span id="<%=memberid%>_username"></span>
-              </a>
-            </td>
-            <td> <span id="<%=memberid%>_name"></span></td>
-            <td> <span id="<%=memberid%>_description"></span></td>
-            <td><span class="team-status team-status-requested">requested</span></td>
-            <% if(admin && !(memberid==team.admin)) {%>
-            <td>
-            </td>
-            <% } %>
-            <script type="text/javascript">
-              getUserDetails("<%=memberid%>");
-            </script>
-          </tr>
-          <% }); %>
-        </tbody>
-      </table>
-    </div>
+      </button>
+    </form>
   </div>
+  <% } %>
+  <div class="col s12">
+    <h5 class="left-align color-theme-green">Team Members:</h5>
+    <table class="bordered striped responsive-table white-text">
+      <thead>
+        <th>userID</th>
+        <th>Name</th>
+        <th>Skills</th>
+        <th>Status</th>
+        <% if(admin && team.memberAccepted>1){ %>
+        <th>Remove</th>
+        <% } %>
+      </thead>
+      <tbody>
+        <!-- for members accepted -->
+        <% _.each(team.memberAccepted,function(memberid){ %>
+        <tr>
+         <td><a id="<%=memberid%>_anchor" class="ver-align-middlee underline-wala">
+          <span id="<%=memberid%>_username"></span>
+          <% if(memberid==team.admin){ %>
+          <img src="/images/admin.png" class="admin-img">
+          <%}%></a></td>
+          <td> <span id="<%=memberid%>_name"></span></td>
+          <td> <span id="<%=memberid%>_description"></span></td>
+          <td><span class="team-status team-status-joined">Joined</span></td>
+          <% if(admin && !(memberid==team.admin)) {%>
+          <td>
+            <form action="/team/removemember" method="POST">
+              <input type="hidden" name="uid" value="<%=memberid%>">
+              <button type="submit" class="hide" value="remove" id="remove_<%=memberid%>">Sure Remove</button>
+              <button type="button" class="team-status team-remove" value="remove" onclick='confirm_submit("remove_<%=memberid%>","Are you sure you want to remove this member ?","Once you remove the member, they can already be added back if you send them an Invite and they accept it ","Remove member")'><i class="fa fa-times" aria-hidden="true"></i> Remove</button>
+            </form>
+          </td>
+          <% } %>
+          <script type="text/javascript">
+            getUserDetails("<%=memberid%>");
+          </script>
+        </tr>
+
+        <% }); %>
+        <% _.each(team.memberSend,function(memberid){ %>
+        <tr>
+          <td>
+            <a id="<%=memberid%>_anchor" class="ver-align-middlee underline-wala">
+              <span id="<%=memberid%>_username"></span>
+            </a>
+          </td>
+          <td> <span id="<%=memberid%>_name"></span></td>
+          <td> <span id="<%=memberid%>_description"></span></td>
+          <td><span class="team-status team-status-requested">requested</span></td>
+          <% if(admin && !(memberid==team.admin)) {%>
+          <td>
+          </td>
+          <% } %>
+          <script type="text/javascript">
+            getUserDetails("<%=memberid%>");
+          </script>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+</div>
 </div>
 <% } %>
 <% if(typeof team == 'undefined' || !team){ %>
@@ -336,6 +362,7 @@
         var str_val=$(this).find('.rank-disp').text();
         console.log("The value is:"+str_val);
         rank[parseInt(str_val)-1]=false;
+         $(this).find('.inp_track').val("0");
       }
       else
       {
@@ -372,11 +399,28 @@
     rank[r4]=true;
   </script>
 
-    <script type="text/javascript">
+  <script type="text/javascript">
    <% if(typeof flash !== 'undefined' && typeof flash.err !== 'undefined' && flash.err){ %>
     sweetAlert("Error", "<%=flash.err%>", "error");
     <% } %>
     <% if(typeof flash !== 'undefined' && typeof flash.success !== 'undefined' && flash.success){ %>
-    sweetAlert("success", "<%=flash.success%>", "success");
-    <% } %>
-  </script>
+      sweetAlert("success", "<%=flash.success%>", "success");
+      <% } %>
+    </script>
+
+    <script type="text/javascript">
+      function confirm_submit(sub_but_id,heading,message,confirmButton){
+        swal({
+          title: heading,
+          text: message,
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#DD6B55",
+          confirmButtonText: confirmButton,
+          closeOnConfirm: true
+        },
+        function(){
+          $("#"+sub_but_id).click();
+        });
+      }
+    </script>

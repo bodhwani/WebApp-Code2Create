@@ -1,4 +1,4 @@
-    <link rel="stylesheet" href="/styles/app_common.css">
+    <link rel="stylesheet" href="/styles/app_common.css?1100">
     <style>
       #submit_mock {
         margin-top: 20px;
@@ -23,7 +23,7 @@
         margin-right: 60px;
       }
       .track-col{
-        height: 190px;
+        height: 170px;
         padding: 1.5rem !important;
         background-color: #373d41;
         border-radius: 10px;
@@ -31,6 +31,10 @@
         cursor: pointer;
         width: 45% !important;
         margin: 2% !important;
+        -webkit-transition: all 0.3s ease;
+        -o-transition: all 0.3s ease;
+        -moz-transition: all 0.3s ease;
+        transition: all 0.3s ease;
       }
 
       .track-col .track-img{
@@ -74,21 +78,59 @@
       .track-col:hover .overlay{
        opacity: 1;
      }
-     .track-col .overlay .track-heading{
+     .track-col:hover{
+      padding: 0.7rem !important;
+    }
+    .track-col .overlay .track-heading{
       vertical-align: middle;
       margin-top: 30%;
     }
-    @media(min-width: 601px){
-      .track-col{
-       height: 210px;
-       width: 21% !important;
-       margin: 2% !important;
-     }
+    .team-status{
+     padding: 0.4rem;
+     display: inline-block;
+     border-radius: 5px;
    }
- </style>
+   .team-remove{
+    background-color: #f44336 !important;
+    border:none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+  .team-status-joined{
+    background-color: #1eb76e !important;
+    opacity: 1;
+  }
 
- <%- partial('../partials/navbar.ejs',{active: 'teamNew'}) %>
- <div class="container">
+  .team-status-requested{
+    background-color: #d32f2f !important;
+    opacity: 0.8;
+  }
+  .team-remove{
+    background-color: #f44336 !important;
+    border:none;
+    box-shadow: none;
+    cursor: pointer;
+  }
+  .team-remove:hover{
+    background-color: #bf291d !important;
+  }
+  @media(min-width: 601px){
+    .track-col{
+     height: 210px;
+     width: 21% !important;
+     margin: 2% !important;
+   }
+ }
+ @media(max-width: 769px){
+  .track-col .overlay{
+    opacity: 1;
+  }
+}
+
+</style>
+
+<%- partial('../partials/navbar.ejs',{active: 'teamNew'}) %>
+<div class="container">
   <div class="heading-bg">
    <h5 class="left-align white-text main-heading">Create A Team</h5>
  </div>
@@ -98,10 +140,10 @@
       <div class="input-field col s12 m10 offset-m1">
         <i class="material-icons prefix">people_outline</i>
         <input id="teamid" type="text" class="validate" required name="teamName" tabindex="1">
-        <label for="teamid">teamid (Choose a teamid eg. coders97) <span class="required">*</span></label>
+        <label for="teamid">TeamName (Choose a TeamName) <span class="required">*</span></label>
       </div>
       <div class="row">
-        <div class="col s12">
+        <div class="col offset-s1 s11">
           <h5 class="left-align grey-colour">Assign priority for each Track:</h5>
         </div>
         <div class="col m3 s6 track-col">
@@ -111,7 +153,7 @@
           </div>
           <div class="rank-disp" id="rank1">
           </div>
-          <img src="/images/tracks/ar.png" class="track-img responsive-img">
+          <img src="/images/tracks/track_arvr.png" class="track-img responsive-img">
         </div>
         <div class="col m3 s6 track-col">
          <input type="hidden" name="helc" class="inp_track">
@@ -120,7 +162,7 @@
         </div>
         <div class="rank-disp">
         </div>
-        <img src="/images/tracks/helc.jpg" class="track-img responsive-img">
+        <img src="/images/tracks/track_helc.png" class="track-img responsive-img">
       </div>
       <div class="col m3 s6 track-col">
        <input type="hidden" name="fint" class="inp_track">
@@ -129,7 +171,7 @@
       </div>
       <div class="rank-disp">
       </div>
-      <img src="/images/tracks/fintech.jpg" class="track-img responsive-img">
+      <img src="/images/tracks/track_fint.png" class="track-img responsive-img">
     </div>
     <div class="col m3 s6 track-col">
      <input type="hidden" name="clen" class="inp_track">
@@ -138,11 +180,11 @@
     </div>
     <div class="rank-disp">
     </div>
-    <img src="/images/tracks/clen.jpg" class="track-img responsive-img">
+    <img src="/images/tracks/track_clen.png" class="track-img responsive-img">
   </div>
 </div>
-<div class="input-field col s12 m12">
-  <textarea id="description" class="validate materialize-textarea" name="description"></textarea>
+<div class="input-field col s12 m12 hide">
+  <textarea id="description" class="validate materialize-textarea" name="description" value=""> </textarea>
   <label for="description">Description of your project...</label>
 </div>
 <div class="row">
@@ -162,6 +204,11 @@
 
 <%- partial('../partials/footer.ejs') %>
 <%- partial('../partials/commonScripts.ejs') %>
+<script type="text/javascript">
+  $("#teamid").on("keydown", function (e) {
+    return (e.which !== 32) && (e.which!== 35) && (e.which!== 36) && (e.which!== 37) && (e.which!== 38) ;
+  });
+</script>
 <script type="text/javascript">
   var cur_rank=0;
   var rank1=false;
@@ -197,6 +244,7 @@
     {
       $(this).removeClass('selected');
       var str_val=$(this).find('.rank-disp').text();
+      $(this).find('.inp_track').val("0");
       console.log("The value is:"+str_val);
       if(str_val=="1")
         rank1=false;
@@ -217,11 +265,11 @@
   });
 </script>
 
-  <script type="text/javascript">
-   <% if(typeof flash !== 'undefined' && typeof flash.err !== 'undefined' && flash.err){ %>
-    sweetAlert("Error", "<%=flash.err%>", "error");
-    <% } %>
-    <% if(typeof flash !== 'undefined' && typeof flash.success !== 'undefined' && flash.success){ %>
-    sweetAlert("success", "<%=flash.success%>", "success");
+<script type="text/javascript">
+ <% if(typeof flash !== 'undefined' && typeof flash.err !== 'undefined' && flash.err){ %>
+  sweetAlert("Error", "<%=flash.err%>", "error");
+  <% } %>
+  <% if(typeof flash !== 'undefined' && typeof flash.success !== 'undefined' && flash.success){ %>
+    sweetAlert("<%=flash.success%>", "Now you can see All Members and Send Invites to them for joining your team.", "success");
     <% } %>
   </script>

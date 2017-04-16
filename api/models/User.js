@@ -26,6 +26,7 @@ module.exports = {
       email : true,
       required: true,
       unique : true
+
     },
 
     username : {
@@ -41,13 +42,13 @@ module.exports = {
 
     college_name : {
       type : 'string',
-      required : false,
+      required : false
 
     },
 
      college_city : {
       type : 'string',
-      required : false,
+      required : false
 
     },
 
@@ -67,18 +68,20 @@ module.exports = {
 
     description : {
       type : 'text',
-      required : false,
+      required : false
 
     },
 
 
     github : {
       type : 'string',
+      url : true,
       required : false
     },
 
     linkedin : {
       type : 'string',
+      url : true,
       required : false
     },
 
@@ -94,6 +97,49 @@ module.exports = {
     encryptedPassword: {
       type: 'string'
     },
+
+    admin : {
+      type : "boolean",
+      defaultsTo : true
+    },
+
+    teamScore : {
+      type: "array"
+    },
+
+    uniqueness : {
+      type : "integer"
+    },
+
+    feasibility : {
+      type : "integer"
+    },
+
+
+    implementation : {
+      type : "integer"
+    },
+
+
+    solution : {
+      type : "integer"
+    },
+
+
+    presentation : {
+      type : "integer"
+    },
+
+
+    ui : {
+      type : "integer"
+    },
+
+    teamname : {
+      type : "string"
+    },
+
+
 
 
 
@@ -116,7 +162,21 @@ module.exports = {
       values.encryptedPassword = encryptedPassword;
       next();
     });
-  }
+  },
+
+  beforeUpdate: function(values, next) {
+    console.log(values.password);
+
+    if(values.password) {
+      require('bcryptjs').hash(values.password, 10, function passwordEncrypted(err, encryptedPassword) {
+        if (err) return next(err);
+        values.encryptedPassword = encryptedPassword;
+        next();
+      });
+    } else {
+      next();
+    }
+  },
+
 
 };
-

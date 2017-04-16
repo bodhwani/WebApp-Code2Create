@@ -1,4 +1,4 @@
-    <link rel="stylesheet" href="/styles/app_common.css">
+    <link rel="stylesheet" href="/styles/app_common.css?1100">
     <style>
       #submit_mock {
         margin-top: 20px;
@@ -22,31 +22,32 @@
     </style>
 
     <%- partial('../partials/navbar.ejs', {active: 'userShow'}) %>
+    <% if(typeof user !=='undefined' && user){ %>
     <div class="container">
       <div class="heading-bg">
         <h5 class="left-align white-text main-heading">Member details</h5>
       </div>
       <div class="my-main-card hoverable white-text">
         <div class="row">
-          <div class="col m6 offset-m3">
+          <div class="col s12 m6 offset-m3">
             <p class="detail-title">
-              userName
+              UserName
             </p>
             <p class="detail-answer margin-bottom-0">
              <i class="material-icons prefix ver-align-middle">account_circle</i>
              <span class="ver-align-middle"><%=user.username%></span>
            </p>
          </div>
-         <div class="col m6 offset-m3">
+         <div class="col s12 m6 offset-m3">
           <p class="detail-title">
-            teamID
+            TeamName
           </p>
           <p class="detail-answer margin-bottom-0">
             <i class="material-icons prefix ver-align-middle">people_outline</i>
             <span class="ver-align-middle"><span id="noteamname">Not in a team</span><a id="teamname_a" class="underline-wala"><span id="teamname"></span></a></span>
           </p>
         </div>
-        <div class="col m6">
+        <div class="col s12 m6">
           <p class="detail-title">
             Name
           </p>
@@ -54,7 +55,7 @@
            <%=user.name%>
          </p>
        </div>
-       <div class="col m6">
+       <div class="col s12 m6">
         <p class="detail-title">
           College
         </p>
@@ -63,11 +64,11 @@
           <%=user.college_name%>
           <% } %>
           <% if(user.internal_external=='internal'){ %>
-          VIT Univeristy,Vellore
+          VIT University, Vellore
           <%}%>
         </p>
       </div>
-      <div class="col m6">
+      <div class="col s12 m6">
         <p class="detail-title">
          Email
        </p>
@@ -75,15 +76,15 @@
          <%=user.email%>
        </p>
      </div>
-     <div class="col m6">
+     <div class="col s12 m6">
       <p class="detail-title">
-       Phone no
+       College Reg. no.
      </p>
      <p class="detail-answer margin-bottom-0">
-       <%=user.phoneno%>
+       <%=user.regno%>
      </p>
    </div>
-   <div class="col m8 offset-m2">
+   <div class="col s12 m8 offset-m2">
     <p class="detail-title">
       Skills
     </p>
@@ -95,7 +96,7 @@
   <br>
   <br>
 </div>
-<div class="col m4 offset-m4 center profile-social">
+<div class="col s12 m4 offset-m4 center profile-social">
   <% if(user.github){%>
   <a href="<%=user.github%>" title="GitHub Profile" target="_blank" class="social-a social-github"><i class="smooth-transition fa fa-2x fa-github" aria-hidden="true"></i>
   </a>
@@ -111,11 +112,12 @@
 
 
 
+
 <%- partial('../partials/footer.ejs') %>
 <%- partial('../partials/commonScripts.ejs') %>
 <script type="text/javascript">
 //get the info of currently logged in user
-$.get("http://c2c.acmvit.in/navbar/anyuserteam/<%=user.id%>", function (data, status) {
+$.get("<%=defaultUrl.url()%>navbar/anyuserteam/<%=user.id%>", function (data, status) {
   var teamname_togive="undefined";
   if (!data)
     console.log("Failure!", "Couldn't fetch navbar/getinfo");
@@ -123,9 +125,9 @@ $.get("http://c2c.acmvit.in/navbar/anyuserteam/<%=user.id%>", function (data, st
    if(data.team){
     $("#noteamname").hide();
     $("#teamname_a").show();
-    $("#teamname_a").attr("href","http://c2c.acmvit.in/team/show/"+data.team.teamName);
+    $("#teamname_a").attr("href","<%=defaultUrl.url()%>team/show/"+encode(encodeURI(data.team.teamName)));
     console.log(data.team.teamName);
-    $("#teamname").html(data.team.teamName);
+    $("#teamname").text(data.team.teamName);
   }
   else{
     $("#noteamname").show();
@@ -144,3 +146,13 @@ $.get("http://c2c.acmvit.in/navbar/anyuserteam/<%=user.id%>", function (data, st
     sweetAlert("success", "<%=flash.success%>", "success");
     <% } %>
   </script>
+<% } %>
+
+
+<% if(typeof user =='undefined' || !user){ %>
+<%- partial('../partials/commonScripts.ejs') %>
+
+<script type="text/javascript">
+   sweetAlert("Error", "No user Found with this id", "error");
+</script>
+<% } %>

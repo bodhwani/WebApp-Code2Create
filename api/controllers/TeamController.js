@@ -3,7 +3,18 @@ var passport = require('passport');
 var i = 0;
 var priorityarray = ["1","2","3","4"];
 
+
+var overall = [];
+var temp = [];
+var array = [];
+var newarray = [];
+
+
 module.exports = {
+
+
+
+
 
   new : function (req, res) {
     var count = 0;
@@ -23,7 +34,9 @@ module.exports = {
       });
       if(count === teams.length){
 
-        res.view();
+        res.view({
+         title: "Create a Team | Code2Create"
+       });
         return;
       }
       else{
@@ -57,25 +70,25 @@ module.exports = {
 
 
     if((!temparvr) || (!temphelc) || (!tempfint) || (!tempclen)){
-        req.session.flash = {
-            err: "Please select all the tracks according to your priority."
-        };
-        return res.redirect('/team/new');
+      req.session.flash = {
+        err: "Please select all the tracks according to your priority."
+      };
+      return res.redirect('/team/new');
     }
 
     if ((temparvr === temphelc) || (temparvr === tempfint) || (temparvr === tempclen) || (temphelc === tempfint) || (temphelc === tempclen) || (tempfint === tempclen)) {
-        req.session.flash = {
-          err: "Cannot select two same priorities."
-        };
-        return res.redirect('/team/new');
-      }
+      req.session.flash = {
+        err: "Cannot select two same priorities."
+      };
+      return res.redirect('/team/new');
+    }
 
 
     if(user) {
       Team.create(req.params.all(), function teamCreated(err, team) {
         if (err) {
           req.session.flash = {
-            err: "Please fill all the details properly"
+            err: "Please fill all the details properly or try with different teamname."
           };
 
           return res.redirect('/team/new');
@@ -93,7 +106,6 @@ module.exports = {
         (array).push(user.id);
         team.memberAccepted = array;
 
-        console.log("HEre is the array");
 
         team.save(
           function (err) {
@@ -128,16 +140,16 @@ module.exports = {
   },
 
   //this is for backend
-  showallteams : function(req, res, next){
-
-    Team.find(function foundTeams(err, teams){
-      if(err) return next(err);
-      res.status(200).json(teams);
-      // res.view({
-      //   teams: teams
-      // });
-    });
-  },
+  // showallteams : function(req, res, next){
+  //
+  //   Team.find(function foundTeams(err, teams){
+  //     if(err) return next(err);
+  //     res.status(200).json(teams);
+  //     // res.view({
+  //     //   teams: teams
+  //     // });
+  //   });
+  // },
 
 
   //this will display all the members to whom admin can send requests.
@@ -167,15 +179,15 @@ module.exports = {
       });
       if(temp === 1){
 
-          User.find(function foundUsers(err, users) {
-            users.forEach(function (user) {
-              teams.forEach(function (team) {
+        User.find(function foundUsers(err, users) {
+          users.forEach(function (user) {
+            teams.forEach(function (team) {
 
-                for(var i=0 ; i<team.memberAccepted.length; i++){
+              for(var i=0 ; i<team.memberAccepted.length; i++){
 
-                  if(team.memberAccepted[i] != user.id){
-                    count = count + 1;
-                  }
+                if(team.memberAccepted[i] != user.id){
+                  count = count + 1;
+                }
                   //   }
                   if(count === team.memberAccepted.length){
                     final = final + 1;
@@ -186,10 +198,10 @@ module.exports = {
 
               });
 
-              if(teams.length === final){
-                memberarray.push(user);
-              }
-              final = 0;
+            if(teams.length === final){
+              memberarray.push(user);
+            }
+            final = 0;
               // else{
               // }
 
@@ -205,19 +217,21 @@ module.exports = {
             res.view({
               membersarray : memberarray,
               teams : teams,
-              admin : true
+              admin : true,
+              title: "All Teams | Code2Create"
             })
           })
 
 
-        }
-        else{
+      }
+      else{
         // return res.status(200).json({
         //   admin : false
         // });
         res.view({
           teams : teams,
-          admin : false
+          admin : false,
+             title: "All Teams | Code2Create"
         })
       }
     })
@@ -233,22 +247,24 @@ module.exports = {
     }).exec(function(err, team) {
 
 
+
       if (err) {
         req.session.flash = {
           err : "Sorry, Error in finding team"
         };
-        return;
+        return res.redirect('/team/showall');;
       }
       if (!team) {
         req.session.flash = {
           err : "Sorry, No team found"
         };
-        return;
+        return res.redirect('/team/showall');
       }
 
       //return res.status(200).json(team);
       res.view({
-        team : team
+        team : team,
+           title: team.teamName + " | Code2Create"
       });
       return;
     });
@@ -264,7 +280,6 @@ module.exports = {
     var temphelc = req.param('helc');
     var tempfint = req.param('fint');
     var tempclen = req.param('clen');
-    var team_description = req.param('description');
 
 
     var update_params_needed = {
@@ -272,18 +287,29 @@ module.exports = {
       helc : temphelc,
       fint : tempfint,
       clen : tempclen,
-      description : team_description
-
     };
 
 
+    if((!temparvr) || (!temphelc) || (!tempfint) || (!tempclen)){
+      req.session.flash = {
+        err: "Please select all the tracks according to your priority."
+      };
+      return res.redirect('/team/myteam');
+    }
+
+    if((temparvr === "0") || (temphelc === "0") || (tempfint === "0") || (tempclen === "0")){
+      req.session.flash = {
+        err: "Please select all the tracks according to your priority."
+      };
+      return res.redirect('/team/myteam');
+    }
 
 
     if ((temparvr === temphelc) || (temparvr === tempfint) || (temparvr === tempclen) || (temphelc === tempfint) || (temphelc === tempclen) || (tempfint === tempclen)) {
       req.session.flash = {
         err: "Cannot select two same priorities."
       };
-      return res.redirect('/team/new');
+      return res.redirect('/team/myteam');
     }
 
 
@@ -331,7 +357,8 @@ module.exports = {
 
         res.view({
           team: team,
-          admin: true
+          admin: true,
+             title: "My Team | Code2Create"
         });
         return;
 
@@ -346,10 +373,10 @@ module.exports = {
             count = count + 1;
             for (var k = 0; k < team.memberAccepted.length; k++) {
 
-                if (team.memberAccepted[k] === (userid)) {
-                  if (team.admin != (userid)) {
-                    temp = 3;
-                    count = 100000000;
+              if (team.memberAccepted[k] === (userid)) {
+                if (team.admin != (userid)) {
+                  temp = 3;
+                  count = 100000000;
 
 
 
@@ -363,7 +390,8 @@ module.exports = {
 
                     res.view({
                       team: team,
-                      admin: false
+                      admin: false,
+                         title: "My Team | Code2Create"
                     });
                     return
                     break;
@@ -380,13 +408,13 @@ module.exports = {
 
           if (count === teams.length) {
 
-              req.session.flash = {
-                  err: "You dont have any team."
-              };
-              return res.redirect('/user/showall');
+            req.session.flash = {
+              err: "You dont have any team."
+            };
+            return res.redirect('/user/showall');
 
-            }
-          });
+          }
+        });
           //
         }
       });
@@ -397,11 +425,10 @@ module.exports = {
   leaveteam : function(req,res,next) {
 
     user = req.session.User;
-
     Team.findOne(req.param('id'), function foundTeam(err, team) {
 
-      for (var i = 0; i < 3; i++) {
-        if (team.memberAccepted[i] === (user.uid)) {
+      for (var i = 0; i < team.memberAccepted.length; i++) {
+        if (team.memberAccepted[i] == (user.uid)) {
           if((user.uid) != team.admin) {
             (team.memberAccepted).splice(i, 1);
           }
@@ -417,14 +444,19 @@ module.exports = {
         }
         team.save(
           function (err) {
-            console.log('saving records for team');
+            req.session.flash = {
+              success: "Successfully left team"
+            };
+            User.findOne({
+              id : team.admin
+            }, function foundTeam(err, tempuser) {
+              LeftTeam.sendWelcomeMail(tempuser, user);
+            });
+            return res.redirect('team/showall');
+            return;
           }
           );
-        req.session.flash = {
-          success: "Successfully left team"
-        };
-        return res.redirect('team/myteam');
-        return;
+
         //res.status(200).json(team);
 
 
@@ -434,12 +466,14 @@ module.exports = {
 
   removemember : function(req,res,next) {
 
-    user = req.session.User;
+    sessionuser = req.session.User;
+
 
     Team.findOne({
-      admin : user.id
+      admin : sessionuser.id
     }, function foundTeam(err, team) {
       User.findOne(req.param('uid'), function foundUser(err, user) {
+
 
         if (team.admin === (user.uid)) {
           //if admin wants to delete itself
@@ -464,7 +498,7 @@ module.exports = {
       }
       else {
           //if admin wants to delete another user.
-          for (var i = 0; i < 3; i++) {
+          for (var i = 0; i < team.memberAccepted.length; i++) {
             if (team.memberAccepted[i] === (user.uid)) {
               (team.memberAccepted).splice(i, 1);
             }
@@ -475,15 +509,17 @@ module.exports = {
           function (err) {
             if(err){
               req.session.flash = {
-                success : "Successfully removed!"
+                err : "Something went wrong.Please try again!"
               };
               return res.redirect('/team/myteam');
             }
             req.session.flash = {
               success : "Successfully removed!"
             };
+            RemoveMember.sendWelcomeMail(sessionuser , user);
 
-            return res.redirect('/team/myteam');          }
+            return res.redirect('/team/myteam');
+          }
           );
 
 
@@ -499,7 +535,9 @@ module.exports = {
 
     var temp = [];
     var l=0;
-
+    var useremail = req.param('email');
+    var sendername = req.session.User.name;
+    var receivername = req.param('name');
     user = req.session.User;
 
     Team.update({
@@ -514,24 +552,19 @@ module.exports = {
         //res.status(200).json(err);
       }
 
-
-
-
       Team.findOne({
         admin : user.id
       }, function foundTeam(err, team) {
 
-
-
         if (err) {
           req.session.flash = {
-            err: "Create your team first, to send requests"
+            err: "Create your team first, to send Invites"
           };
           return res.redirect('/user/showall');
         }
         if (!team) {
           req.session.flash = {
-            err: "Create your team first, to send requests"
+            err: "Create your team first, to send Invites"
           };
           return res.redirect('/user/showall');
         }
@@ -553,7 +586,7 @@ module.exports = {
                   }
                   else {
                     req.session.flash = {
-                      err: "Admin cannot send request to himself"
+                      err: "Admin cannot send Invitation to himself"
                     };
                     return res.redirect('/user/showall');
 
@@ -563,7 +596,7 @@ module.exports = {
                 else {
 
                   req.session.flash = {
-                    err: "Already sent request to this person"
+                    err: "Already send Invitation to this person"
                   };
                   return res.redirect('/user/showall');
 
@@ -577,7 +610,7 @@ module.exports = {
                 }
                 else {
                   req.session.flash = {
-                    err: "Admin cannot send request to himself"
+                    err: "Admin cannot send Invitation to himself"
                   };
                   return res.redirect('/user/showall');
 
@@ -587,14 +620,19 @@ module.exports = {
               //undefined while entering the first entry
               team.save(
                 function (err) {
-                  console.log('saving records for team');
+                  req.session.flash = {
+                    success: "successfully Send Invitation"
+                  };
+                  sendRequestMail.sendWelcomeMail(sendername, receivername, useremail);
+
+                  return res.redirect('/user/showall');
                 }
                 );
             }
             else{
 
               req.session.flash = {
-                err: "Cannot send request to himself"
+                err: "Cannot send Invitation to himself"
               };
               return res.redirect('/user/showall');
 
@@ -604,11 +642,6 @@ module.exports = {
           }
 
       //return res.status(200).json(team);
-
-      req.session.flash = {
-        success: "successfully Send Request"
-      };
-      return res.redirect('/user/showall');
 
       //return res.redirect('/team/show/' + team.teamName );
     });
@@ -645,8 +678,9 @@ module.exports = {
 
 
         res.view({
-          err : "You have received no request for joining team",
-          requestview : requestview
+          err : "You have received no invitations for joining team",
+          requestview : requestview,
+             title: "View Invites| Code2Create"
         });
       }
 
@@ -666,9 +700,9 @@ module.exports = {
     Team.findOne(req.param('id'), function foundTeam(err, team) {
 
 
-          Team.find(function foundTeams(err, teams) {
+      Team.find(function foundTeams(err, teams) {
 
-            if(teams) {
+        if(teams) {
             //sails.models.team.checkmembers(user.id)
 
             teams.forEach(function (tempteam) {
@@ -755,7 +789,7 @@ module.exports = {
             //})
           }
         });
-        });
+    });
 
   },
   //here uid is id of that person, who is accepting that team request.
@@ -800,10 +834,269 @@ module.exports = {
 
     });
 
+  },
+
+
+
+  'enter_problem' : function (req, res) {
+    return res.view();
+  },
+
+  entered_or_not : function (req, res,next) {
+
+    var bool = false;
+
+    user = req.session.User;
+    if(user.admin) {
+      Team.find(function foundTeams(err, teams) {
+        teams.forEach(function (team) {
+
+
+          if (team.judge) {
+            for (var i = 0; i < team.judge.length; i++) {
+              if (team.judge) {
+                console.log(team.judge[i].username);
+                if (team.judge[i].username === user.username) {
+                  return res.json({
+                    bool : true,
+                    teams : teams
+                  })
+                }
+              }
+            }
+          }
+
+        });
+      });
+    }
+    else{
+      req.session.flash = {
+        success: "Successfully updated problem statement."
+      };
+      return res.view("team/all_teams");
+    }
+
+
+
+
+
+
+    },
+
+
+  all_teams : function (req, res, next) {
+    user = req.session.User;
+    var bool = false;
+
+    if(user.admin) {
+      Team.find(function foundTeams(err, teams) {
+        return res.json({
+          teams: teams
+        })
+      });
+    }
+    else{
+      req.session.flash = {
+        success: "Successfully updated problem statement."
+      };
+      return res.view("team/all_teams");
+    }
+  },
+
+  update_problem_statement : function (req, res, next) {
+
+    var problemStatement = req.param('problemStatement');
+    var track = req.param('track');
+
+    Team.findOne({
+      teamName : req.param('id')
+    }).exec(function(err, team) {
+      if(!team){
+        req.session.flash = {
+          err: " Team not found. Please fill it again"
+        };
+        return res.redirect('/team/enter_problem');
+      }
+
+      team.problemStatement = problemStatement;
+      team.track = track;
+      team.save(function (err) {
+        if(err){
+          req.session.flash = {
+            success: "Oops! Something went wrong while updating team."
+          };
+          return res.redirect('/team/enter_problem');
+        }
+        req.session.flash = {
+          success: "Successfully updated problem statement."
+        };
+        // return res.json({
+        //   success: "Successfully updated problem statement."
+        // });
+        return res.redirect('/team/enter_problem');
+      })
+    });
+  },
+
+
+  update_score : function (req, res, next) {
+
+    console.log("entered inot update_score");
+
+    var uniqueness = req.param('uniqueness');
+    var feasibility = req.param('feasibility');
+    var implementation = req.param('implementation');
+    var solution = req.param('solution');
+    var presentation = req.param('presentation');
+    var ui = req.param('ui');
+
+
+
+
+    User.findOne({
+      username: req.param('username')
+    }).exec(function(err, user) {
+
+      if (!user) {
+
+        return res.json({
+          message: "No user"
+        });
+
+        req.session.flash = {
+          success: "Sorry! Wrong username or password."
+        };
+        return res.redirect('/team/enter_problem');
+      }
+
+
+      Team.findOne({
+        teamName: req.param('id')
+      }).exec(function (err, team) {
+
+
+
+
+        console.log(user.admin);
+
+        if (user.admin) {
+
+          console.log("User is ");
+          console.log(user.name);
+
+          user.uniqueness = uniqueness;
+          user.feasibility = feasibility;
+          user.implementation = implementation;
+          user.solution = solution;
+          user.presentation = presentation;
+          user.ui = ui;
+          user.teamname = team.teamName;
+
+
+
+
+          if(team.judge){
+            temp.push(user);
+            (team.judge) = temp;
+          }
+          else{
+            newarray.push(user);
+            team.judge = newarray;
+          }
+
+
+          team.save(function (err) {
+            if (err) {
+
+              req.session.flash = {
+                success: "Sorry problem in updating team."
+              };
+              return res.redirect('/team/enter_problem');
+            }
+
+
+            console.log("Successfully updated");
+            return res.json({
+              team : team,
+            });
+
+            req.session.flash = {
+              success: "Successfully uploaded."
+            };
+            return res.redirect('/team/all_teams');
+
+          })
+
+
+        }
+        else {
+          req.session.flash = {
+            success: "Sorry you are not admin."
+          };
+          return res.redirect('/team/enter_problem');
+        }
+      });
+    });
+    },
+
+
+  noofteams : function (req, res, next) {
+    var temparray = [];
+
+    Team.find(function foundTeams(err, teams) {
+
+      teams.forEach(function (team) {
+        if(team.clen === "1"){
+          temparray.push(team);
+        }
+
+      });
+      console.log(temparray.length);
+
+
+    });
+  },
+
+
+
+  pairs : function (req, res, next) {
+
+    var lol = [];
+
+    Team.find(function foundTeams(err, teams){
+
+      teams.forEach(function (team) {
+          if (team.judge) {
+            for (var i = 0; i < team.judge.length; i++) {
+              if(team.judge[i].teamname === "Zenith") {
+                lol.push(team.judge);
+              }
+            }
+          }
+
+      });
+
+      console.log(lol);
+    });
+
+
+
+
   }
 
 
+
 };
+
+
+
+
+
+
+
+
+
+
 
 
 
