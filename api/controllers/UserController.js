@@ -22,26 +22,7 @@ module.exports = {
 
   create : function(req, res, next) {
 
-    var recaptcha_secret = "6LcTthcUAAAAAGoJ2l5SeaBzleD7D_RaHk1key9V";
-    var us_name = req.param('name');
-    var us_regno = req.param('regno');
-    var us_phoneno = req.param('phoneno');
-    var us_email = req.param('email');
-    var us_username = req.param('username');
-    var us_internal_external = req.param('internal_external');
-    var us_college_name = req.param('college_name');
-    var us_college_city = req.param('college_city');
-    var us_living = req.param('living');
-    var us_block = req.param('block');
-    var us_roomno = req.param('roomno');
-    var us_description = req.param('description');
-    var us_github = req.param('github');
-    var us_linkedin = req.param('linkedin');
-    var us_response = req.param('g-recaptcha-response');
-    var us_ip = req.ip;
-    var us_gender = req.param('gender');
-    var us_password = req.param('password');
-    var us_confirmation = req.param('confirmation');
+ 
 
     // if (!us_name || !us_regno || !us_email || !us_phoneno || !us_living || (us_living == 'hostler' && (!us_block || !us_roomno)) || !us_password || !us_confirmation) {
     //   req.session.flash = {
@@ -186,60 +167,7 @@ module.exports = {
 
 
 
-  // showall : function (req, res, next) {
-  //
-  //
-  //   var iduser = 0;
-  //   var count = 0;
-  //   var final = 0;
-  //   var memberarray = [];
-  //   Team.find(function foundTeams(err, teams) {
-  //     if (err) {
-  //       return next(err);
-  //     }
-  //     User.find(function foundUsers(err, users) {
-  //       users.forEach(function (user) {
-  //         teams.forEach(function (team) {
-  //
-  //
-  //           for(var i=0 ; i<team.memberAccepted.length; i++){
-  //
-  //             if(team.memberAccepted[i] != user.id){
-  //               count = count + 1;
-  //             }
-  //             //   }
-  //             if(count === team.memberAccepted.length){
-  //               final = final + 1;
-  //             }
-  //             //   count = 0;
-  //           }
-  //           count = 0;
-  //
-  //         });
-  //
-  //
-  //
-  //         if(teams.length === final){
-  //           memberarray.push(user);
-  //         }
-  //         final = 0;
-  //
-  //
-  //       });
-  //
-  //      // return res.status(200).json(memberarray);
-  //       res.view({
-  //         users : users,
-  //         memberarray : memberarray
-  //       });
-  //       return;
-  //
-  //       //
-  //     })
-  //
-  //   });
-  //
-  // },
+ 
 
   showall : function (req, res, next) {
 
@@ -420,47 +348,7 @@ module.exports = {
       });
   },
 
-  // forgetPasswordd : function (req, res, next) {
-  //
-  //   User.findOneByEmail(req.param('email'), function foundUser(err, user) {
-  //     if (err) return next(err);
-  //
-  //     // If no user is found...
-  //     if (!user) {
-  //       var noAccountError = [{
-  //         name: 'noAccount',
-  //         message: 'The email address ' + req.param('email') + ' not found.'
-  //       }];
-  //       req.session.flash = {
-  //         err2: noAccountError
-  //       };
-  //       res.redirect('/session/new');
-  //       return;
-  //     }
-  //
-  //     if(user){
-  //       //Mailer.sendWelcomeMail(user);
-  //       res.status(200).json({
-  //         user:  user,
-  //         message : "Check your email"
-  //       });
-  //     }
-  //   });
-  // },
-  //
-  // resetPasswordd : function (req, res, next) {
-  //
-  //   User.update(req.param('id'),req.params.all(), function userUpdated(err){
-  //     if(err){
-  //       return res.redirect('/user/edit/'+req.param('id'));
-  //     }
-  //     res.redirect('/user/show/'+req.param('id'));
-  //   });
-  //
-  //
-  //
-  //
-  // }
+ 
 
   external : function (req, res, next) {
 
@@ -715,28 +603,7 @@ module.exports = {
 
   },
 
-  passwordusers : function (req, res, next) {
-    var idemail = [];
-    var final = [];
-    User.find({
-      encryptedPassword : "$2a$10$E64tJt4WaiqE4yaWccj7EOdAhqksfiTy4JETtnFBJ.7ALcjZomyr6"
-    }, function foundUsers(err, users) {
-      users.forEach(function (user) {
-        idemail.push(user.id);
-        idemail.push(user.name);
-        idemail.push(user.email);
-        final.push(idemail);
-        idemail = [];
-      });
-      for(var i=0;i<final.length; i++){
-        changePassword.sendWelcomeMail(final[i]);
-      }
-      return res.json({
-        users : final
-      })
-
-    })
-  },
+ 
 
 
 
